@@ -18,10 +18,12 @@ func checkForInvalidIds(file []string) {
 		end, _ := strconv.Atoi(matches[2])
 		fmt.Printf("Start range: %d    End range: %d\n", start, end)
 		for i := start; i <= end; i++ {
-			currentId := string(i)
-			for j := 0; j <= len(currentId); j++ {
+			currentId := strconv.Itoa(i)
+			fmt.Printf("Inside the range - current id: %s\n", currentId)
+			for j := 0; j < len(currentId); j++ {
+				currSubId := currentId[:j+1]
+				fmt.Printf("Sub Id: %s\n", currSubId)
 			}
-			fmt.Printf("Inside the range - current id: %d\n", i)
 		}
 	}
 }
