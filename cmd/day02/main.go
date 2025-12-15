@@ -12,6 +12,7 @@ import (
 
 func repeatedIdsAtLeastTwice(file []string) {
 	re := regexp.MustCompile("([0-9]+)-([0-9]+)")
+	var sum int
 	for id := range strings.SplitSeq(file[0], ",") {
 		matches := re.FindStringSubmatch(id)
 		start, _ := strconv.Atoi(matches[1])
@@ -19,16 +20,21 @@ func repeatedIdsAtLeastTwice(file []string) {
 		fmt.Printf("Start range: %d    End range: %d\n", start, end)
 		for i := start; i <= end; i++ {
 			currentId := strconv.Itoa(i)
-			// fmt.Printf("Inside the range - current id: %s\n", currentId)
 			for j := 0; j < len(currentId)-1; j++ {
+				if j > len(currentId)/2 {
+					break
+				}
 				currSubId := fmt.Sprintf(`^(%s)+$`, currentId[:j+1])
 				invalidId, _ := regexp.MatchString(currSubId, currentId)
 				if invalidId {
 					fmt.Printf("INVALID ID ----> %s\n", currentId)
+					sum += i
+					break
 				}
 			}
 		}
 	}
+	fmt.Println(sum)
 }
 
 func repeatedIdsTwice(file []string) {
@@ -56,5 +62,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	repeatedIdsTwice(file)
+	repeatedIdsAtLeastTwice(file)
 }
