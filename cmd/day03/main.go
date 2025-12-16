@@ -22,6 +22,7 @@ func maxJoltage(jolts []string) {
 			maxRight = max(leftJoltInt, maxRight)
 		}
 		totalJolt += bankMax
+		//
 	}
 	fmt.Println(totalJolt)
 }
