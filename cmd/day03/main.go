@@ -8,9 +8,9 @@ import (
 	"github.com/randy115/advent-of-code-2025/internal/input"
 )
 
-func maxJoltage(jolts []string) {
+func maxTwoBatteries(banks []string) {
 	var totalJolt int
-	for _, jolt := range jolts {
+	for _, jolt := range banks {
 		var bankMax int
 		maxRight, _ := strconv.Atoi(string(jolt[len(jolt)-1]))
 		for i := len(jolt) - 2; i >= 0; i-- {
@@ -22,9 +22,22 @@ func maxJoltage(jolts []string) {
 			maxRight = max(leftJoltInt, maxRight)
 		}
 		totalJolt += bankMax
-		//
 	}
 	fmt.Println(totalJolt)
+}
+
+func maxTwelveBatteries(banks []string) {
+	fmt.Println(len(banks[0]))
+	for _, jolt := range banks {
+		remove := len(jolt) - 12
+		stack := make([]int, 0, 12)
+		for i := 0; i < len(jolt); i++ {
+			if len(stack) == 0 {
+				battery, _ := strconv.Atoi(string(jolt[i]))
+				stack = append(stack, battery)
+			}
+		}
+	}
 }
 
 func main() {
@@ -32,5 +45,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	maxJoltage(file)
+	maxTwelveBatteries(file)
 }
