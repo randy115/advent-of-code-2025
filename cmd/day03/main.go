@@ -28,6 +28,7 @@ func maxTwoBatteries(banks []string) {
 
 func maxTwelveBatteries(banks []string) {
 	stack := make([]int, 0, 12)
+	totalJolt := 0
 	for _, jolt := range banks {
 		remove := len(jolt) - 12
 		fmt.Printf("CURRENT BATTERY BANK: %s\n", jolt)
@@ -35,41 +36,30 @@ func maxTwelveBatteries(banks []string) {
 			fmt.Println("-------------------------------------------------")
 			battery, _ := strconv.Atoi(string(jolt[i]))
 			fmt.Printf("remove count %d\n", remove)
-			fmt.Printf("Current Stack: %d\nCurrent Battery: %d\n", stack, battery)
-			fmt.Println("Current length:", len(stack))
-			if len(stack) == 0 {
-				fmt.Printf("Stack is empty appending battery %d\n", battery)
-				stack = append(stack, battery)
-			} else if stack[len(stack)-1] < battery && remove > 0 {
-				remainingString := len(jolt) - i
-				for len(stack) > 0 && stack[len(stack)-1] < battery && remove > 0 && remainingString > 0 {
-					fmt.Printf("Battery %d < Top Stack Battery %d\nPushing %d\n", stack[len(stack)-1], battery, battery)
-					stack = stack[:len(stack)-1]
-					remove -= 1
-					remainingString -= 1
-				}
-				stack = append(stack, battery)
-			} else if stack[len(stack)-1] < battery && remove == 0 && len(stack) < 12 {
-				stack = append(stack, battery)
-			} else if stack[len(stack)-1] >= battery && len(stack) < 12 {
-				fmt.Printf("Battery %d > Top Stack Battery %d\nPushing %d\n", stack[len(stack)-1], battery, battery)
-				stack = append(stack, battery)
-			} else if len(stack) == 12 {
-				fmt.Println("last else statement")
-				stack[len(stack)-1] = battery
+			fmt.Printf("Current Stack: %d\n", stack)
+			fmt.Printf("Current Battery: %d\n", battery)
+			for len(stack) > 0 && stack[len(stack)-1] < battery && remove > 0 {
+				fmt.Printf("Battery %d < Top Stack Battery %d\n", stack[len(stack)-1], battery)
+				stack = stack[:len(stack)-1]
+				remove -= 1
 			}
+			fmt.Printf("Pushing %d\n", battery)
+			stack = append(stack, battery)
 		}
-		fmt.Println(len(stack))
-		fmt.Println(stack)
-		fmt.Println("len:", len(stack))
-		fmt.Println("cap:", cap(stack))
-		stack = stack[:0]
 		fmt.Println("-------------------------------------------------")
+		result := 0
+		for _, num := range stack[:12] {
+			result = result*10 + num
+		}
+		totalJolt += result
+		stack = stack[:0]
+		fmt.Println(result)
 	}
+	fmt.Println(totalJolt)
 }
 
 func main() {
-	file, err := input.ReadFile("day03e.txt")
+	file, err := input.ReadFile("day03.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
