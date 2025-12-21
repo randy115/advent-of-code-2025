@@ -51,7 +51,6 @@ func validateId(file []string) {
 func getAllValidId(file []string) {
 	re := regexp.MustCompile("([0-9]+)-([0-9]+)")
 	var idRange [][]int64
-	var ids []int64
 	var validId int64
 	for _, ingredientIds := range file {
 		match := re.FindStringSubmatch(ingredientIds)
@@ -59,9 +58,6 @@ func getAllValidId(file []string) {
 			start, _ := strconv.ParseInt(match[1], 10, 64)
 			end, _ := strconv.ParseInt(match[2], 10, 64)
 			idRange = append(idRange, []int64{start, end})
-		} else if ingredientIds != "" {
-			id, _ := strconv.ParseInt(ingredientIds, 10, 64)
-			ids = append(ids, id)
 		}
 	}
 
@@ -80,15 +76,22 @@ func getAllValidId(file []string) {
 		return 0
 	})
 
-	for _, ingredientId := range idRange {
-		fmt.Printf("STARTING ID RANGES %d - %d\n", ingredientId[0], ingredientId[1])
-		// for i := ingredientId[0]; i < ingredientId[1]; i++ {
-		// 	fmt.Printf("ADDING INGREDIENT ID %d\n", i)
-		// 	validId += 1
-		// }
-		// fmt.Printf("STARTING ID RANGES %d - %d\n", ingredientId[0], ingredientId[1])
-		validId += (ingredientId[1] - ingredientId[0]) + 1
+	var prevStart int64 = idRange[0][0]
+	var prevEnd int64 = idRange[0][1]
+
+	for _, ingredientId := range idRange[1:] {
+		if prevEnd >= ingredientId[0] {
+			prevEnd = max(ingredientId[1], prevEnd)
+		} else {
+			validId += (prevEnd - prevStart + 1)
+			fmt.Printf("getting ids %d-%d = %d\n", prevEnd, prevStart, validId)
+			prevStart = ingredientId[0]
+			prevEnd = ingredientId[1]
+
+		}
 	}
+
+	validId += (prevEnd - prevStart + 1)
 	fmt.Println(validId)
 }
 
