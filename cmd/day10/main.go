@@ -9,30 +9,81 @@ import (
 	"github.com/randy115/advent-of-code-2025/internal/input"
 )
 
-func configureLights(schemes []string) {
-	for _, scheme := range schemes {
-		line := strings.Fields(scheme)
-		light := []byte(strings.Trim(line[0], "[]"))
-		fmt.Printf("%s\n", light)
-		var buttons [][]int
-		for i := 1; i < len(light); i++ {
-			button := []int{}
-			if strings.HasPrefix(line[i], "(") {
-				nums := strings.Trim(line[i], "()")
-				for num := range strings.SplitSeq(nums, ",") {
-					res, _ := strconv.Atoi(num)
-					button = append(button, res)
-				}
+func parseSchematics(schemes []string) (string, [][]int) {
+	light := strings.Trim(schemes[0], "[]")
+	var buttons [][]int
+	for i := 1; i < len(schemes); i++ {
+		var button []int
+		if strings.HasPrefix(schemes[i], "(") {
+			nums := strings.Trim(schemes[i], "()")
+			for num := range strings.SplitSeq(nums, ",") {
+				res, _ := strconv.Atoi(num)
+				button = append(button, res)
 			}
+		}
+		if button != nil {
 			buttons = append(buttons, button)
 		}
-		fmt.Printf("buttons %v\n", buttons)
-
 	}
+	return light, buttons
+}
+
+func bfs(desiredState string, buttons [][]int) int {
+	visited := make(map[string]struct{})
+	initial := strings.Repeat(".", len(desiredState))
+	queue := []string{initial}
+	presses := 0
+	// fmt.Printf("DESIRED STATE %s\n", desiredState)
+	for len(queue) > 0 {
+		nextLevel := []string{}
+		for _, pattern := range queue {
+			// fmt.Printf("CURRENT PATTERN %s\n", pattern)
+			// fmt.Printf("START -------------------------------------------\n\n")
+
+			if desiredState == pattern {
+				fmt.Printf("desired light pattern found %s ===== %s\n", desiredState, pattern)
+				return presses
+			}
+
+			if _, ok := visited[pattern]; !ok {
+				// fmt.Printf("light pattern not found: %s adding to map\n", pattern)
+				visited[pattern] = struct{}{}
+				for _, row := range buttons {
+					light := []byte(pattern)
+					// fmt.Printf("current button set %d\n", row)
+					for _, col := range row {
+						if light[col] == '.' {
+							light[col] = '#'
+						} else {
+							light[col] = '.'
+						}
+					}
+					// fmt.Printf("new light pattern %s\n", light)
+					nextLevel = append(nextLevel, string(light))
+				}
+			}
+			// fmt.Printf("END -------------------------------------------\n\n")
+		}
+		// fmt.Printf("current queue %v\n", nextLevel)
+		// fmt.Printf("current map %v\n", visited)
+		queue = nextLevel
+		presses += 1
+	}
+	return 0
+}
+
+func configureLights(schemes []string) {
+	total := 0
+	for _, scheme := range schemes {
+		line := strings.Fields(scheme)
+		desiredState, buttons := parseSchematics(line)
+		total += bfs(desiredState, buttons)
+	}
+	fmt.Println(total)
 }
 
 func main() {
-	file, err := input.ReadFile("day10e.txt")
+	file, err := input.ReadFile("day10.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
