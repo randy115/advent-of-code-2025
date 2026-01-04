@@ -9,9 +9,10 @@ import (
 	"github.com/randy115/advent-of-code-2025/internal/input"
 )
 
-func parseSchematics(schemes []string) (string, [][]int) {
+func parseSchematics(schemes []string) (string, [][]int, []int) {
 	light := strings.Trim(schemes[0], "[]")
 	var buttons [][]int
+	var joltageLevels []int
 	for i := 1; i < len(schemes); i++ {
 		var button []int
 		if strings.HasPrefix(schemes[i], "(") {
@@ -20,12 +21,19 @@ func parseSchematics(schemes []string) (string, [][]int) {
 				res, _ := strconv.Atoi(num)
 				button = append(button, res)
 			}
+		} else if strings.HasPrefix(schemes[i], "[") {
+			jolts := strings.Trim(schemes[i], "[]")
+			for jolt := range strings.SplitSeq(jolts, ",") {
+				res, _ := strconv.Atoi(jolt)
+				joltageLevels = append(joltageLevels, res)
+			}
 		}
+
 		if button != nil {
 			buttons = append(buttons, button)
 		}
 	}
-	return light, buttons
+	return light, buttons, joltageLevels
 }
 
 func bfs(desiredState string, buttons [][]int) int {
@@ -41,7 +49,7 @@ func bfs(desiredState string, buttons [][]int) int {
 			// fmt.Printf("START -------------------------------------------\n\n")
 
 			if desiredState == pattern {
-				fmt.Printf("desired light pattern found %s ===== %s\n", desiredState, pattern)
+				fmt.Printf("desired light pattern found %s \n", desiredState)
 				return presses
 			}
 
@@ -76,7 +84,7 @@ func configureLights(schemes []string) {
 	total := 0
 	for _, scheme := range schemes {
 		line := strings.Fields(scheme)
-		desiredState, buttons := parseSchematics(line)
+		desiredState, buttons, _ := parseSchematics(line)
 		total += bfs(desiredState, buttons)
 	}
 	fmt.Println(total)
